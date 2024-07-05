@@ -141,6 +141,7 @@ const TerminalComponent = () => {
   const terminalRef = useRef(null);
   const [terminal, setTerminal] = useState(null);
   const [fitAddon, setFitAddon] = useState(null);
+  const [prompt, setPrompt] = useState('');
 
   useEffect(() => {
     if (terminalRef.current && !terminal) {
@@ -153,25 +154,32 @@ const TerminalComponent = () => {
       
       const newFitAddon = new FitAddon();
       term.loadAddon(newFitAddon);
-      
+
       term.open(terminalRef.current);
       newFitAddon.fit();
-      
-      term.write('cc~ $ ');
 
       setTerminal(term);
       setFitAddon(newFitAddon);
 
       term.onKey(({ key, domEvent }) => {
         const printable = !domEvent.altKey && !domEvent.ctrlKey && !domEvent.metaKey;
-
+      
         if (domEvent.keyCode === 13) { // Enter key
-          const command = term.buffer.active.getLine(term.buffer.active.cursorY).translateToString().trim().replace(/^cc~ \$ /, '');
+          const fullLine = term.buffer.active.getLine(term.buffer.active.cursorY).translateToString().trim();
+          const command = fullLine.substring(prompt.length).trim();
+          term.write('\r\n');
           sendCommand(command, term);
+        } else if (domEvent.keyCode === 8) { // Backspace
+          if (term.buffer.active.cursorX > prompt.length) {
+            term.write('\b \b');
+          }
         } else if (printable) {
           term.write(key);
         }
       });
+
+      // Initial command to get the prompt
+      sendCommand('', term);
     }
   }, [terminalRef.current]);
 
@@ -194,16 +202,28 @@ const TerminalComponent = () => {
     }
   }, [terminal, fitAddon]);
 
-  const sendCommand = async (command, term) => {
+  const sendCommand = async (input, term) => {
     try {
+      const regex = /(?:.*[$>])\s*(.*)/;
+      const match = input.match(regex);
+      const command = match ? match[1] : input.trim();
+  
+      console.log('Sending command:', command);  // For debugging
+  
       const result = await invoke('send_command_to_terminal', { command });
-      term.writeln('');
-      term.writeln(result);
-      term.write('cc~ $ ');
+      term.write(result);
+      
+      // Extract and set the new prompt
+      const lines = result.split('\n');
+      if (lines.length > 0) {
+        const lastLine = lines[lines.length - 1].trim();
+        if (lastLine.endsWith('$') || lastLine.endsWith('>')) {
+          setPrompt(lastLine);
+        }
+      }
     } catch (error) {
       console.error('Error:', error);
       term.writeln(`Error: ${error}`);
-      term.write('cc~ $ ');
     }
   };
 
@@ -211,3 +231,6 @@ const TerminalComponent = () => {
 };
 
 export default TerminalComponent;
+
+
+// term.buffer.active.getLine(term.buffer.active.cursorY).translateToString().trim();

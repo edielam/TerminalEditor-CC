@@ -1,7 +1,7 @@
 # Phase 1 and 2 of CortexCode Project
 A desktop application featuring a code editor and an embedded terminal emulator. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing and testing code.
 
-(TermED)[https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/prgs1.png]
+![TermED](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/prgs1.png)
 ## Features
 
 - **Code Editor**: 

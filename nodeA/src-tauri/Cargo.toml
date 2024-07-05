@@ -1,11 +1,11 @@
 [package]
-name = "merged_app"
+name = "CC-node-A"
 version = "0.1.1"
-description = "A Tauri App with P2P functionality"
-authors = ["you"]
+description = "Realtime distributed code editor"
+authors = ["Edward Lampoh"]
 license = ""
 repository = ""
-default-run = "merged_app"
+default-run = "CC-node-A"
 edition = "2021"
 rust-version = "1.60"
 

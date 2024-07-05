@@ -3,6 +3,45 @@
 version = 3
 
 [[package]]
+name = "CC-node-A"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64 0.22.1",
+ "bitflags 2.6.0",
+ "clap",
+ "dotenv",
+ "env_logger",
+ "futures",
+ "futures-timer",
+ "futures-util",
+ "home",
+ "libc",
+ "libp2p",
+ "libp2p-webrtc",
+ "log",
+ "once_cell",
+ "parking_lot",
+ "polling",
+ "rand 0.8.5",
+ "regex",
+ "regex-automata 0.4.7",
+ "rustix-openpty",
+ "serde",
+ "serde_json",
+ "signal-hook",
+ "tauri",
+ "tauri-build",
+ "tempfile",
+ "tokio",
+ "tokio-tungstenite",
+ "tokio-util",
+ "unicode-width",
+ "vte",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3369,45 +3408,6 @@ checksum = "c73f5c649995a115e1a0220b35e4df0a1294500477f97a91d0660fb5abeb574a"
 dependencies = [
  "libc",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "merged_app"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "async-trait",
- "base64 0.22.1",
- "bitflags 2.6.0",
- "clap",
- "dotenv",
- "env_logger",
- "futures",
- "futures-timer",
- "futures-util",
- "home",
- "libc",
- "libp2p",
- "libp2p-webrtc",
- "log",
- "once_cell",
- "parking_lot",
- "polling",
- "rand 0.8.5",
- "regex",
- "regex-automata 0.4.7",
- "rustix-openpty",
- "serde",
- "serde_json",
- "signal-hook",
- "tauri",
- "tauri-build",
- "tempfile",
- "tokio",
- "tokio-tungstenite",
- "tokio-util",
- "unicode-width",
- "vte",
 ]
 
 [[package]]

@@ -57,7 +57,7 @@ A desktop application featuring a code editor and an embedded terminal emulator.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## Acknowledgements
 
@@ -65,3 +65,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - [React](https://reactjs.org/)
 - [Tauri](https://tauri.app/)
 - [xterm.js](https://xtermjs.org/)
+- [Alacritty](https://alacritty.org/)

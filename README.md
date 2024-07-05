@@ -66,3 +66,4 @@ This project is licensed under the MIT License.
 - [Tauri](https://tauri.app/)
 - [xterm.js](https://xtermjs.org/)
 - [Alacritty](https://alacritty.org/)
+- [Universal connectivity project](https://github.com/libp2p/universal-connectivity)

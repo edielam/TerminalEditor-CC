@@ -26,7 +26,7 @@ h3 {
   margin: 0; /* Ensure there's no extra margin pushing it upwards */
 }
 
-.chat-box {
+/* .chat-box {
   background: #91cbd0;
   border-radius: 5px;
   width: 10rem;
@@ -110,4 +110,4 @@ input::placeholder {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
+} */

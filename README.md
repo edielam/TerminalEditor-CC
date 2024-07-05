@@ -1,7 +1,7 @@
-# Phase 1 and 2 of CortexCode Project
-A desktop application featuring a code editor and an embedded terminal emulator. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing and testing code.
+# Phase 1, 2 and 3 of CortexCode Project
+A desktop application featuring a code editor, an embedded terminal emulator and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing and testing code.
 
-![TermED](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/prgs1.png)
+![TermED](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/nodeA/nodeA/public/pfftrue.png)
 ## Features
 
 - **Code Editor**: 
@@ -66,3 +66,4 @@ This project is licensed under the MIT License.
 - [Tauri](https://tauri.app/)
 - [xterm.js](https://xtermjs.org/)
 - [Alacritty](https://alacritty.org/)
+- [Universal connectivity project](https://github.com/libp2p/universal-connectivity)

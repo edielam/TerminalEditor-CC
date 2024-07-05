@@ -1,0 +1,109 @@
+/* index.css */
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.App {
+  width: 500px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #282c34;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 20px; /* Add margin at the top */
+}
+
+h1 {
+  color: #61dafb;
+  text-align: center;
+  margin: 0; /* Ensure there's no extra margin pushing it upwards */
+}
+
+.chat-box {
+  background-color: #333;
+  border-radius: 5px;
+  padding: 10px;
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.chat-message {
+  background-color: #444;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+input[type="text"] {
+  width: calc(100% - 90px);
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  background-color: #555;
+  color: #fff;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 7px 7px;
+  border: none;
+  border-radius: 5px;
+  background-color: #61dafb;
+  color: #282c34;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #21a1f1;
+}
+
+input::placeholder {
+  color: #ccc;
+}
+
+#peerIdLabel {
+  margin-top: 20px;
+  font-size: 0.9em;
+  text-align: center;
+  color: #fcfcfc;
+}
+
+.peerIdtext {
+  font-size: 0.9em;
+  text-align: center;
+  color: #5fe5e5;
+}
+
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+
+.loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

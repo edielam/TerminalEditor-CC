@@ -97,7 +97,7 @@ const PORT_WEBRTC: u16 = 9090;
 const PORT_QUIC: u16 = 9091;
 const LOCAL_KEY_PATH: &str = "./local_key";
 const LOCAL_CERT_PATH: &str = "./cert.pem";
-const GOSSIPSUB_CHAT_TOPIC: &str = "universal-connectivity";
+const GOSSIPSUB_CHAT_TOPIC: &str = "cortexcode";
 
 // Static variables
 

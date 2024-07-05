@@ -20,24 +20,28 @@ body {
   margin-top: 20px; /* Add margin at the top */
 }
 
-h1 {
+h3 {
   color: #61dafb;
   text-align: center;
   margin: 0; /* Ensure there's no extra margin pushing it upwards */
 }
 
 .chat-box {
-  background-color: #333;
+  background: #91cbd0;
   border-radius: 5px;
+  width: 10rem;
   padding: 10px;
   height: 300px;
   overflow-y: auto;
+  margin-left: 10px;
   margin-bottom: 20px;
   box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  align-items: center;
 }
 
 .chat-message {
-  background-color: #444;
+  background-color: #91cbd0;
   color: #fff;
   padding: 10px;
   border-radius: 5px;

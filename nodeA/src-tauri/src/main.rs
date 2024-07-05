@@ -32,7 +32,7 @@ use std::{
     collections::hash_map::DefaultHasher,
     env,
     hash::{Hash, Hasher},
-    time::Duration,
+    time::{Duration,Instant},
 };
 use tokio::fs;
 use tokio::sync::mpsc;
@@ -75,12 +75,14 @@ struct MessageStore {
 
 struct MessageTx(mpsc::Sender<String>);
 
+// struct AppState {
+//     pty: Arc<Mutex<Pty>>,
+//     ptx: Arc<Sender<String>>,
+//     prompt: Arc<Mutex<String>>,  // Add this line
+// }
 struct AppState {
-    pty: Arc<Mutex<Pty>>,
-    ptx: Arc<Sender<String>>,
-    prompt: Arc<Mutex<String>>,  // Add this line
+    pty: std::sync::Mutex<Pty>
 }
-
 
 #[derive(serde::Serialize)]
 struct FileItem {
@@ -102,7 +104,7 @@ const GOSSIPSUB_CHAT_TOPIC: &str = "cortexcode";
 // Static variables
 
 static MESSAGE_STORE: OnceCell<Arc<Mutex<MessageStore>>> = OnceCell::new();
-static SWARM: OnceCell<Arc<Mutex<Swarm<Behaviour>>>> = OnceCell::new();
+// static SWARM: OnceCell<Arc<Mutex<Swarm<Behaviour>>>> = OnceCell::new();
 static CHAT_TOPIC_HASH: Lazy<Mutex<Option<gossipsub::TopicHash>>> = Lazy::new(|| Mutex::new(None));
 
 #[tokio::main]
@@ -142,6 +144,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pty_fd = pty.file().as_raw_fd();
     println!("New PTY instance : {} created", pty_fd);
 
+    let output_file = pty.file().try_clone()?;
+
     // libp2p setup
     let opt = Opt::parse();
     let local_key = read_or_create_identity(Path::new(LOCAL_KEY_PATH))
@@ -151,7 +155,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .context("Failed to read certificate")?;
 
-    let (tx, mut rx) = mpsc::channel::<String>(100);
+    let (tx, rx) = mpsc::channel::<String>(100);
 
     let mut swarm = create_swarm(local_key, webrtc_cert).context("Failed to create swarm")?;
 
@@ -174,114 +178,127 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .listen_on(address_quic.clone())
         .context("Failed to listen on QUIC address")?;
 
-    // Setup broadcast channel for PTY output
-    let (ptytx, _ptyrx) = broadcast::channel(16);
-    let ptx = Arc::new(ptytx);
-    let pty = Arc::new(Mutex::new(pty));
-    let prompt = Arc::new(Mutex::new(String::new()));
-
-    // Clone TX for WebSocket server
-    let tx_clone = ptx.clone();
-    let pty_clone = Arc::clone(&pty);
-    let pty_clone_for_ws = pty_clone.clone();
-
-    // Spawn WebSocket server
-    tokio::spawn(async move {
-        let listener = TcpListener::bind("127.0.0.1:8081").await.unwrap();
-        println!("WebSocket server started on 127.0.0.1:8081");
-        while let Ok((stream, _)) = listener.accept().await {
-            let tx = tx_clone.clone();
-            let pty_inner_clone = Arc::clone(&pty_clone_for_ws); // Rename this to avoid confusion
-            let callback = |req: &Request, mut response: Response| {
-                println!("Incoming connection from: {}", req.uri());
-                let headers = response.headers_mut();
-                headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
-                Ok(response)
-            };
-            tokio::spawn(async move {
-                match tokio_tungstenite::accept_hdr_async(stream, callback).await {
-                    Ok(ws_stream) => {
-                        let (mut ws_sender, mut ws_receiver) = ws_stream.split();
-                        let mut rx = tx.subscribe();
+    let spawn_handle = tokio::spawn({
+        let arc_swarm = Arc::new(Mutex::new(swarm));
+        let arc_swarm_clone1 = arc_swarm.clone();
     
-                        let pty_writer = pty_inner_clone.clone(); // Use the cloned value here
-    
-                        let to_pty = tokio::spawn(async move {
-                            while let Some(msg) = ws_receiver.next().await {
-                                if let Ok(Message::Text(text)) = msg {
-                                    let mut pty = pty_writer.lock().await;
-                                    if let Err(e) = pty.writer().write_all(text.as_bytes()) {
-                                        eprintln!("Failed to write to PTY: {}", e);
-                                    }
-                                }
-                            }
-                        });
-    
-                        let from_pty = tokio::spawn(async move {
-                            while let Ok(msg) = rx.recv().await {
-                                if let Err(e) = ws_sender.send(Message::Text(msg)).await {
-                                    eprintln!("Failed to send message over WebSocket: {}", e);
-                                    break;
-                                }
-                            }
-                        });
-    
-                        tokio::select! {
-                            _ = to_pty => {},
-                            _ = from_pty => {},
-                        }
-                    },
-                    Err(e) => eprintln!("WebSocket handshake error: {}", e),
+        async move {
+            let swarm_handle = tokio::spawn({
+                async move {
+                    if let Err(e) = run_swarm_operations(&arc_swarm_clone1, rx).await {
+                        eprintln!("Error in swarm operations: {:?}", e);
+                    }
                 }
             });
+    
+            tokio::select! {
+                _ = swarm_handle => {},
+            }
         }
     });
     
-    // Clone TX for PTY reader
-    let tx_clone = tx.clone();
-    // Clone the PTY for the PTY reader task
-    let pty_reader_clone = Arc::clone(&pty_clone);
-    // Spawn PTY reader
-    let prompt_clone = Arc::clone(&prompt);
-    tokio::spawn(async move {
-        loop {
-            let mut buffer = [0; 1024];
-            let n = {
-                let mut binding = pty_reader_clone.lock().await;
-                match binding.reader().read(&mut buffer) {
-                    Ok(n) => n,
-                    Err(e) if e.kind() == ErrorKind::WouldBlock => {
-                        tokio::time::sleep(Duration::from_millis(10)).await;
-                        continue;
-                    }
-                    Err(e) => {
-                        eprintln!("Error reading from PTY: {}", e);
-                        tokio::time::sleep(Duration::from_millis(100)).await;
-                        continue;
-                    }
-                }
-            };
 
-            if n == 0 {
-                break; // End of file
-            }
+    // // Setup broadcast channel for PTY output
+    // let (ptytx, _ptyrx) = broadcast::channel(16);
+    // let ptx = Arc::new(ptytx);
+    // let pty = Arc::new(Mutex::new(pty));
+    // let prompt = Arc::new(Mutex::new(String::new()));
 
-            let output = String::from_utf8_lossy(&buffer[..n]).to_string();
+    // // Clone TX for WebSocket server
+    // let tx_clone = ptx.clone();
+    // let pty_clone = Arc::clone(&pty);
+    // let pty_clone_for_ws = pty_clone.clone();
+
+    // // Spawn WebSocket server
+    // tokio::spawn(async move {
+    //     let listener = TcpListener::bind("127.0.0.1:8081").await.unwrap();
+    //     println!("WebSocket server started on 127.0.0.1:8081");
+    //     while let Ok((stream, _)) = listener.accept().await {
+    //         let tx = tx_clone.clone();
+    //         let pty_inner_clone = Arc::clone(&pty_clone_for_ws); // Rename this to avoid confusion
+    //         let callback = |req: &Request, mut response: Response| {
+    //             println!("Incoming connection from: {}", req.uri());
+    //             let headers = response.headers_mut();
+    //             headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
+    //             Ok(response)
+    //         };
+    //         tokio::spawn(async move {
+    //             match tokio_tungstenite::accept_hdr_async(stream, callback).await {
+    //                 Ok(ws_stream) => {
+    //                     let (mut ws_sender, mut ws_receiver) = ws_stream.split();
+    //                     let mut rx = tx.subscribe();
+    
+    //                     let pty_writer = pty_inner_clone.clone(); // Use the cloned value here
+    
+    //                     let to_pty = tokio::spawn(async move {
+    //                         while let Some(msg) = ws_receiver.next().await {
+    //                             if let Ok(Message::Text(text)) = msg {
+    //                                 let mut pty = pty_writer.lock().await;
+    //                                 if let Err(e) = pty.writer().write_all(text.as_bytes()) {
+    //                                     eprintln!("Failed to write to PTY: {}", e);
+    //                                 }
+    //                             }
+    //                         }
+    //                     });
+    
+    //                     let from_pty = tokio::spawn(async move {
+    //                         while let Ok(msg) = rx.recv().await {
+    //                             if let Err(e) = ws_sender.send(Message::Text(msg)).await {
+    //                                 eprintln!("Failed to send message over WebSocket: {}", e);
+    //                                 break;
+    //                             }
+    //                         }
+    //                     });
+    
+    //                     tokio::select! {
+    //                         _ = to_pty => {},
+    //                         _ = from_pty => {},
+    //                     }
+    //                 },
+    //                 Err(e) => eprintln!("WebSocket handshake error: {}", e),
+    //             }
+    //         });
+    //     }
+    // });
+    
+    // // Clone TX for PTY reader
+    // let tx_clone = tx.clone();
+    // // Clone the PTY for the PTY reader task
+    // let pty_reader_clone = Arc::clone(&pty_clone);
+    // // Spawn PTY reader
+    // let prompt_clone = Arc::clone(&prompt);
+    // // PTY reader task
+    // tokio::spawn(async move {
+    //     loop {
+    //         let mut buffer = [0; 1024];
+    //         let n = {
+    //             let mut binding = pty_reader_clone.lock().await;
+    //             match binding.reader().read(&mut buffer) {
+    //                 Ok(n) => n,
+    //                 Err(e) if e.kind() == ErrorKind::WouldBlock => {
+    //                     tokio::time::sleep(Duration::from_millis(10)).await;
+    //                     continue;
+    //                 }
+    //                 Err(e) => {
+    //                     eprintln!("Error reading from PTY: {}", e);
+    //                     tokio::time::sleep(Duration::from_millis(100)).await;
+    //                     continue;
+    //                 }
+    //             }
+    //         };
+
+    //         if n == 0 {
+    //             break; // End of file
+    //         }
+
+    //         let output = String::from_utf8_lossy(&buffer[..n]).to_string();
             
-            // Check if the output ends with a prompt-like pattern
-            if output.trim().ends_with('$') || output.trim().ends_with('>') {
-                let mut prompt = prompt_clone.lock().await;
-                *prompt = output.trim().to_string();
-            }
-
-            // Send the full output, including the prompt
-            if let Err(_) = tx_clone.send(output).await {
-                eprintln!("Failed to send PTY output");
-            }
-        }
-    });
-    
-
+    //         // Send the full output
+    //         if let Err(_) = tx_clone.send(output).await {
+    //             eprintln!("Failed to send PTY output");
+    //         }
+    //     }
+    // });
 
 
     // Run Tauri application
@@ -307,10 +324,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             _ => {}
         })
+        // .manage(AppState {
+        //     pty: Arc::clone(&pty),
+        //     ptx,
+        //     prompt: Arc::clone(&prompt),
+        // })
         .manage(AppState {
-            pty: Arc::clone(&pty),
-            ptx,
-            prompt: Arc::clone(&prompt),
+            pty: std::sync::Mutex::new(pty),
         })
         .manage(MessageTx(tx))
         .invoke_handler(tauri::generate_handler![
@@ -325,6 +345,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+    spawn_handle.await.context("Error in spawn handle")?;
 
     Ok(())
 }
@@ -382,26 +403,95 @@ fn read_dir(path: String) -> Result<Vec<FileItem>, String> {
     Ok(items)
 }
 
+// #[tauri::command]
+// async fn send_command_to_terminal(
+//     command: String,
+//     state: State<'_, AppState>,
+// ) -> Result<String, String> {
+//     let mut pty = state.pty.lock().await;
+//     println!("command received: {}", command.clone());
+
+//     // Write the command to the PTY
+//     let command_with_newline = format!("{}\n", command);
+//     pty.writer()
+//         .write_all(command_with_newline.as_bytes())
+//         .map_err(|e| e.to_string())?;
+//     pty.writer().flush().map_err(|e| e.to_string())?;
+
+//     // Get the current prompt
+//     // let prompt = state.prompt.lock().await.clone();
+
+//     // Ok(prompt) // Return the current prompt
+//     // Read the output from the PTY with a timeout
+//     let mut output = String::new();
+//     let start_time = Instant::now();
+//     let timeout = Duration::from_secs(5); // 5 second timeout
+
+//     while start_time.elapsed() < timeout {
+//         let mut buffer = [0; 1024];
+//         match pty.reader().read(&mut buffer) {
+//             Ok(0) => break, // End of input
+//             Ok(n) => {
+//                 output.push_str(&String::from_utf8_lossy(&buffer[..n]));
+//                 if output.contains(&command) && output.contains('\n') {
+//                     break; // We've likely received the full output
+//                 }
+//             },
+//             Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+//                 // No data available right now, wait a bit
+//                 std::thread::sleep(Duration::from_millis(100));
+//                 continue;
+//             },
+//             Err(e) => return Err(e.to_string()),
+//         }
+//     }
+
+//     if output.is_empty() {
+//         return Err("Timeout or no output received".to_string());
+//     }
+
+//     Ok(output)
+// }
 #[tauri::command]
-async fn send_command_to_terminal(
-    command: String,
-    state: State<'_, AppState>,
-) -> Result<String, String> {
-    let mut pty = state.pty.lock().await;
-    println!("command received: {}", command.clone());
+fn send_command_to_terminal(command: String, state: State<AppState>) -> Result<String, String> {
+    let mut pty = state.pty.lock().unwrap();
 
     // Write the command to the PTY
     let command_with_newline = format!("{}\n", command);
-    pty.writer()
-        .write_all(command_with_newline.as_bytes())
-        .map_err(|e| e.to_string())?;
+    pty.writer().write_all(command_with_newline.as_bytes()).map_err(|e| e.to_string())?;
     pty.writer().flush().map_err(|e| e.to_string())?;
 
-    // Get the current prompt
-    let prompt = state.prompt.lock().await.clone();
+    // Read the output from the PTY with a timeout
+    let mut output = String::new();
+    let start_time = Instant::now();
+    let timeout = Duration::from_secs(5); // 5 second timeout
 
-    Ok(prompt) // Return the current prompt
+    while start_time.elapsed() < timeout {
+        let mut buffer = [0; 1024];
+        match pty.reader().read(&mut buffer) {
+            Ok(0) => break, // End of input
+            Ok(n) => {
+                output.push_str(&String::from_utf8_lossy(&buffer[..n]));
+                if output.contains(&command) && output.contains('\n') {
+                    break; // We've likely received the full output
+                }
+            },
+            Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                // No data available right now, wait a bit
+                std::thread::sleep(Duration::from_millis(100));
+                continue;
+            },
+            Err(e) => return Err(e.to_string()),
+        }
+    }
+
+    if output.is_empty() {
+        return Err("Timeout or no output received".to_string());
+    }
+
+    Ok(output)
 }
+
 
 async fn run_swarm_operations(
     swarm: &Arc<Mutex<Swarm<Behaviour>>>,

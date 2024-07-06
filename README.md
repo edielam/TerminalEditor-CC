@@ -1,28 +1,36 @@
 # Phase 1, 2 and 3 of CortexCode Project
-A desktop application featuring a code editor, an embedded terminal emulator and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing and testing code.
+
+A desktop application featuring a code editor, an embedded terminal emulator, and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing, testing, and sharing code.
 
 ![TermED](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/nodeA/nodeA/public/pfftrue.png)
+
 ## Features
 
 - **Code Editor**: 
   - Integrated code editor with syntax highlighting and autocomplete features.
   - Built using React for a responsive and dynamic interface.
-
 - **Terminal Emulator**: 
   - Embedded terminal emulator for executing commands directly within the application.
   - Utilizes xterm.js for a rich terminal experience.
+- **P2P Network Layer**:
+  - Implements a peer-to-peer network for collaborative coding and resource sharing.
+  - Overcomes NAT traversal challenges for cross-country collaboration.
+<!--  - Enables distributed computing capabilities among peers. -->
 
 ## Built With
 
-- **Rust**: Backend server logic.
+- **Rust**: Backend server logic and network layer implementation.
 - **React**: Frontend framework for building the UI.
 - **Tauri**: Framework for creating the desktop application.
 - **xterm.js**: Terminal emulator for the embedded terminal.
+- **Libp2p**: For peer-to-peer network layer.
+<!-- - **STUN/TURN servers**: For NAT traversal in the network layer. -->
 
 ## Progress
 
 - The code editor is fully functional and integrated into the Tauri desktop application.
 - The terminal emulator is embedded and allows for command execution within the app.
+- The P2P network layer is operational, enabling peer discovery and communication.
 
 ## Getting Started
 
@@ -53,7 +61,7 @@ A desktop application featuring a code editor, an embedded terminal emulator and
 
 - Open the application to start coding in the integrated code editor.
 - Use the embedded terminal to execute commands and manage your development environment.
-
+- Connect with peers through the P2P network layer for collaborative coding and resource sharing.
 
 ## License
 

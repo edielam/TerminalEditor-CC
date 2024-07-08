@@ -22,7 +22,6 @@ A desktop application featuring a code editor, an embedded terminal emulator, an
 - **Rust**: Backend server logic and network layer implementation.
 - **React**: Frontend framework for building the UI.
 - **Tauri**: Framework for creating the desktop application.
-- **xterm.js**: Terminal emulator for the embedded terminal.
 - **Libp2p**: For peer-to-peer network layer.
 <!-- - **STUN/TURN servers**: For NAT traversal in the network layer. -->
 

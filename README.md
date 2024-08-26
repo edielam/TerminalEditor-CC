@@ -2,7 +2,10 @@
 
 A desktop application featuring a code editor, an embedded terminal emulator, and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing, testing, and sharing code.
 
-![TermED](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/mini.png)
+![TermED](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/main/demo.JPG)
+
+![TermED2](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/main/demo4.JPG)
+
 
 ## Features
 

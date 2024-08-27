@@ -1,46 +1,62 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "Node2"
+version = "0.1.1"
+description = "A Tauri App with P2P functionality"
+authors = ["0xed24"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "Node2"
 edition = "2021"
 rust-version = "1.60"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
 tauri-build = { version = "1.5.2", features = [] }
 
 [dependencies]
-serde_json = "1.0"
+anyhow = "1.0.58"
+clap = { version = "4.1.11", features = ["derive", "env"] }
+dotenv = "0.15"
+futures = "0.3.27"
+libp2p = { version = "0.52.3", features = [
+    "identify",
+    "ping",
+    "tokio",
+    "gossipsub",
+    "macros",
+    "relay",
+    "kad",
+    "rsa",
+    "ed25519",
+    "quic",
+    "request-response",
+    "dns",
+    "memory-connection-limits",
+] }
+libp2p-webrtc = { version = "0.6.0-alpha", features = ["tokio", "pem"] }
+log = "0.4.17"
+once_cell = "1.19.0"
+tokio = { version = "1.27.0", features = ["full"] }
+tauri = { version = "1.5.2", features = [ "shell-all"] }
+async-trait = "0.1.68"
+serde_json = "1.0.82"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.6.4", features = [ "http-all", "dialog-all"] }
-regex = "1.8.4"
-libc = "0.2"
-tokio = { version = "1.0", features = ["full"] }
-tokio-tungstenite = "0.15"
-base64 = "0.22.0"
-bitflags = "2.4.1"
-home = "0.5.5"
-log = "0.4"
-parking_lot = "0.12.0"
-polling = "3.0.0"
-regex-automata = "0.4.3"
-unicode-width = "0.1"
-tempfile = "3.2"
-futures-util = "0.3"
-vte = { version = "0.13.0", default-features = false, features = ["ansi", "serde"] }
+futures-timer = "3.0.2"
+env_logger = "0.10.0"
+rand = "0.8.5"
+reqwest = { version = "0.11", features = ["blocking"] }
+bytes = "1.1.0"
+futures-util = "0.3.8"
+serde_derive = "1.0"
+mt_logger = "3.0.2"
+tokio-tungstenite = "0.18.0"
+portable-pty = "0.8.0"
+dirs = "4.0.0"
+whoami = "1.2.1"
+config = "0.14.0"
+fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
+
 
 [target.'cfg(unix)'.dependencies]
-rustix-openpty = "0.1.1"
-signal-hook = "0.3.10"
-
 
 [features]
-# this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
-# If you use cargo directly instead of tauri's cli you can use this feature flag to switch between tauri's `dev` and `build` modes.
-# DO NOT REMOVE!!
-custom-protocol = [ "tauri/custom-protocol" ]
+custom-protocol = ["tauri/custom-protocol"]

@@ -1,30 +1,48 @@
 {
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeBuildCommand": "npm run build",
-    "beforeDevCommand": "npm run start",
-    "devPath": "http://localhost:3000",
-    "distDir": "../build",
+    "beforeDevCommand": "npm run dev",
+    "devPath": "http://localhost:3030",
+    "distDir": "../dist",
     "withGlobalTauri": true
   },
   "package": {
     "productName": "CortexCode",
-    "version": "0.1.1"
+    "version": "0.2.0"
   },
   "tauri": {
     "allowlist": {
       "all": false,
-      "http": {
+      "shell": {
+        "open": true,
         "all": true,
-        "request": true,
-        "scope": ["http://localhost:8081/*", "ws://localhost:8081/*"]
-      },
-      "dialog": {
-        "all": true
+        "execute": true,
+        "sidecar": true,
+        "scope": [
+          {
+            "name": "sh",
+            "cmd": "sh",
+            "args": ["-c", { "validator": "\\S+" }]
+          },
+          {
+            "name": "cmd",
+            "cmd": "cmd",
+            "args": ["/C", { "validator": "\\S+" }]
+          }
+        ]
       }
     },
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
+      "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
       "copyright": "",
       "deb": {
         "depends": []
@@ -37,16 +55,10 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.edd.cortexcode",
       "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [],
+      
+      "resources": ["config.toml"],
       "shortDescription": "",
       "targets": "all",
       "windows": {
@@ -66,8 +78,8 @@
         "fullscreen": false,
         "height": 800,
         "resizable": true,
-        "title": "CortexCode",
-        "width": 800
+        "title": "CortexCode Node 2",
+        "width": 1000
       }
     ]
   }

@@ -66,7 +66,7 @@ static CHAT_TOPIC_HASH: Lazy<Mutex<Option<gossipsub::TopicHash>>> = Lazy::new(||
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let _ = fix_path_env::fix();
+    // let _ = fix_path_env::fix();
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
     initialize_message_store().await?;
     // Tauri setup

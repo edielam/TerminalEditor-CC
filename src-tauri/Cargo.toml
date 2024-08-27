@@ -53,7 +53,7 @@ portable-pty = "0.8.0"
 dirs = "4.0.0"
 whoami = "1.2.1"
 config = "0.14.0"
-fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
+# fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
 
 
 [target.'cfg(unix)'.dependencies]

@@ -66,9 +66,6 @@ A desktop application featuring a code editor, an embedded terminal emulator, an
 - Use the embedded terminal to execute commands and manage your development environment.
 - Connect with peers through the P2P network layer for collaborative coding and resource sharing.
 
-## License
-
-This project is licensed under the MIT License.
 
 ## Acknowledgements
 
@@ -76,5 +73,5 @@ This project is licensed under the MIT License.
 - [React](https://reactjs.org/)
 - [Tauri](https://tauri.app/)
 - [xterm.js](https://xtermjs.org/)
-- [Alacritty](https://alacritty.org/)
+- [Manter](https://github.com/iondodon/manter)
 - [Universal connectivity project](https://github.com/libp2p/universal-connectivity)

@@ -1,12 +1,12 @@
 # Phase 1, 2 and 3 of CortexCode Project
 
-A desktop application featuring a code editor, an embedded terminal emulator, and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing, testing, and sharing code.
+A desktop application featuring a code editor, an embedded terminal emulator, and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing, testing, and sharing code. (PS: Code files have been moved to a private repo until completion of final phase)
 
-<!--![TermED](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/main/d3.JPG) -->
+![TermED1](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d3.png)
 
-![TermED2](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/main/d2.JPG)
+![TermED2](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d4.png)
 
-<!--[TermED](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/main/d1.JPG) -->
+![TermED3](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d1.png)
 
 ## Features
 
@@ -15,7 +15,7 @@ A desktop application featuring a code editor, an embedded terminal emulator, an
   - Built using React for a responsive and dynamic interface.
 - **Terminal Emulator**: 
   - Embedded terminal emulator for executing commands directly within the application.
-  - Utilizes xterm.js for a rich terminal experience.
+  - Utilizes xterm.js for ui and a pty serving rust backend.
 - **P2P Network Layer**:
   - Implements a peer-to-peer network for collaborative coding and resource sharing.
   - Overcomes NAT traversal challenges for cross-country collaboration.

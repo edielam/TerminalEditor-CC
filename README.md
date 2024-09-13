@@ -2,11 +2,13 @@
 
 A desktop application featuring a code editor, an embedded terminal emulator, and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing, testing, and sharing code. (PS: Code files have been moved to a private repo until completion of final phase)
 
-![TermED1](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d3.png)
+<video src="https://github.com/edielam/about_me/raw/portfolio/src/assets/cortex/democc.mp4" width="640" height="480" controls></video>
+
+<!--[TermED1](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d3.png)
 
 ![TermED2](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d4.png)
 
-![TermED3](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d1.png)
+![TermED3](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d1.png) -->
 
 ## Features
 

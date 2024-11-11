@@ -1,7 +1,10 @@
-# Phase 1, 2 and 3 of CortexCode Project
+# Phase 1, 2 and 3 of Lever(previously CortexCode) Project
 
 A desktop application featuring a code editor, an embedded terminal emulator, and a working p2p network layer. This application is built with Tauri, Rust, and React, providing a seamless development environment for writing, testing, and sharing code. (PS: Code files have been moved to a private repo until completion of final phase)
+### UI update
+![Lever](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/refs/heads/nodeA/leverdemo.JPG)
 
+### previous ui
 ![CortexCode](https://github.com/edielam/about_me/raw/portfolio/src/assets/cortex/democc.gif)
 <!--[TermED1](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/cortex/d3.png)
 

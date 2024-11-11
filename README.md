@@ -5,10 +5,10 @@ A desktop application featuring a code editor, an embedded terminal emulator, an
 ### UI update
 ![Lever](https://raw.githubusercontent.com/edielam/TerminalEditor-CC/refs/heads/nodeA/leverdemo.JPG)
 
-### previous uis
+### previous ui
 ![CortexCode](https://github.com/edielam/about_me/raw/portfolio/src/assets/cortex/democc.gif)
 
-![TermED](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/mini.png)
+<!--![TermED](https://raw.githubusercontent.com/edielam/about_me/portfolio/src/assets/mini.png) -->
 
 ## Features
 
